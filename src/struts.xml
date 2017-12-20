@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<constant name="struts.objectFactory.spring.autoWire" value="type" />
+	<package name="default" namespace="/"
+		extends="struts-default">
+
+
+		
+
+
+		<action name="user*" class="com.renthouse.two.action.UserAction"
+			method="{1}">
+			<!-- 登录页的显示 -->
+			<result name="loginpage">WEB-INF/page/login.jsp</result>
+			<!-- 用户登录执行 -->
+			<!-- <result name="success" type="redirectAction">${nextDispose}</result> -->
+			<result name="error">/fail.jsp</result>
+			<!-- 用户注册执行 -->
+			<!-- input属性的作用？ -->
+			<result name="input">WEB-INF/page/login.jsp</result>
+			<result name="reg_success">WEB-INF/page/login.jsp</result>
+			<result name="reg_error">/fail.jsp</result>
+		</action>
+
+
+
+		<!-- 用户注册页面的显示 -->
+		<action name="regsteredpage" class="com.renthouse.two.action.UserAction"
+			method="regsteredpage">
+			<result name="regsteredpage">WEB-INF/page/regs.jsp</result>
+		</action>
+
+		<action name="*page" class="com.renthouse.two.action.HouseAction"
+			method="{1}">
+			<!-- 管理员列表的显示 -->
+			<result name="ma_success">WEB-INF/page/guanli.jsp</result>
+			<result name="ma_error">/fail.jsp</result>
+			<!-- 用户列表的显示 --><!-- 用户列表的房屋搜索 -->
+			<result name="co_success">WEB-INF/page/list.jsp</result>
+			<result name="co_error">/fail.jsp</result>
+			<!-- 房屋详细信息 -->
+			<result name="success">WEB-INF/page/details.jsp</result>
+			<result name="error">/fail.jsp</result>
+			<!-- 发布租房信息 跳转 -->
+			<result name="Releainfopage">WEB-INF/page/fabu.jsp</result>
+			<!-- 进入修改发布信息页面 -->
+			<result name="tomodify">WEB-INF/page/fabu.jsp</result>
+			<result name="toadd">WEB-INF/page/fabu.jsp</result>
+		</action>
+
+		<action name="*house" class="com.renthouse.two.action.HouseAction"
+			method="{1}">
+			<!-- 修改发布信息 -->
+			<result type="redirectAction" name="success">managerpage</result>
+			<!-- 删除发布信息 -->
+			<!-- action间跳转（重定向） -->
+			<result type="redirectAction" name="deletsuccess">managerpage</result>
+			<result name="deleterorr">WEB-INF/page/fabu.jsp</result>
+			<!-- 管理员发布信息 -->
+			<result type="redirectAction" name="add_success">managerpage</result>
+			<result name="add_error">/fail.jsp</result>
+		</action>
+
+	</package>
+</struts>    

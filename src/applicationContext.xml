@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	 xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+	http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+	<!-- 新增完整的声明事务开启(需要tx和aop两个命名空间 -->
+
+	<!-- 定义dbcp数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<!-- 编码转换一定要，不然搜索里面传入的中文值，会显示中文乱码，导致无法搜索到内容 ,正确的写法 -->
+		<!-- 指定JDBc驱动 -->
+		<property name="driverClassName" value="com.mysql.jdbc.Driver">
+		</property>
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/renthouse?useUnicode=true&amp;characterEncoding=UTF-8">
+		</property>
+		<!-- 提供链接数据库的用户名和密码 -->
+		<property name="username" value="root">
+		</property>
+		<property name="password" value="123456">
+		</property>
+	</bean>
+
+
+	<!-- sessionFactory bean定义 该方法没有注解功能 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<!-- 第一种方法 -->
+		<!-- 为AnnotationSessionFactoryBean注入定义好的数据源 -->
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<!-- 添加Hibernate配置参数 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<!-- <prop key="javax.persistence.validation.mode">none</prop> -->
+			</props>
+		</property>
+		<!-- 添加对象关系映射文件 -->
+		<property name="mappingResources">
+			<list>
+				<value>com/renthouse/two/entity/House.hbm.xml</value>
+				<value>com/renthouse/two/entity/District.hbm.xml</value>
+				<value>com/renthouse/two/entity/Street.hbm.xml</value>
+				<value>com/renthouse/two/entity/Type.hbm.xml</value>
+				<value>com/renthouse/two/entity/Users.hbm.xml</value>
+			</list>
+		</property>
+
+		<!-- 第二种方法 直接读取 -->
+		<!-- <property name="configLocation"> <value>classpath:hibernate.cfg.xml</value> 
+			</property> -->
+	</bean>
+	<!-- sessionFactory（）方法使Dao通过依赖注入方式获得sessionFactory实例 -->
+
+
+	<bean id="usersDAO" class="com.renthouse.two.dao.impl.UsersDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="userService" class="com.renthouse.two.service.impl.UserServiceImpl">
+		<property name="usersDAO" ref="usersDAO" />
+	</bean>
+
+
+	<bean id="UserAction" class="com.renthouse.two.action.UserAction"
+		scope="prototype">
+		<property name="userService" ref="userService" />
+	</bean>
+
+
+
+	<!-- 事务管理器 -->
+	<!-- <bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager"> 
+		<property name="sessionFactory" ref="sessionFactory" /> </bean> <tx:advice 
+		id="txAdvice" transaction-manager="txManager"> <tx:attributes> <tx:method 
+		name="find" read-only="true" /> <tx:method name="add" read-only="false" propagation="REQUIRED" 
+		/> <tx:method name="*" read-only="true" /> </tx:attributes> </tx:advice> -->
+	<!-- 定义切面 -->
+	<!-- <aop:config> <aop:pointcut expression="execution(* com.renthouse.two.service.impl.*.*(..))" 
+		id="serviceMethod" /> <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethod" 
+		/> </aop:config> -->
+
+</beans>
